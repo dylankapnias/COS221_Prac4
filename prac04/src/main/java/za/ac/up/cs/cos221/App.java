@@ -200,6 +200,19 @@ public class App
     }
 
     public static JPanel createFilmsTab() {
+        Vector<String> c = new Vector<>();
+        c.add("Insert Film Title");
+        c.add("Insert Film Description");
+        c.add("Insert Film Release Year");
+        c.add("Insert Film Language");
+        c.add("Insert The Original Film Language");
+        c.add("Insert Film Rental Duration");
+        c.add("Insert Film Rental Price");
+        c.add("Insert Film Length");
+        c.add("Insert Film Cost of Replacement");
+        c.add("Insert Film Rating");
+        c.add("Insert Film Special Features");
+
         JPanel control = new JPanel();
         control.setLayout(new BorderLayout());
 
@@ -210,7 +223,37 @@ public class App
         b.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println(e);
+                JPanel p = new JPanel();
+                p.setLayout(new GridLayout(12, 2));
+                //p.setLayout(null);
+
+                JLabel labels[] = new JLabel[11];
+                JTextField texts[] = new JTextField[11];
+
+                for (int i = 0; i < 11; i++) {
+                    labels[i] = new JLabel(c.get(i));
+                    labels[i].setBounds(10, 10 * i, 35, 25);
+
+                    texts[i] = new JTextField(20);
+                    texts[i].setBounds(50, 10 * i, 20, 25);
+
+                    p.add(labels[i]);
+                    p.add(texts[i]);
+                }
+                JButton addButton = new JButton("Add");
+                p.add(addButton);
+
+                Popup pop = new PopupFactory().getPopup(control, p, 100, 100);
+
+                addButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        pop.hide();
+                    }
+                });
+
+                pop.show();
             }
         });
         bSpace.add(b, BorderLayout.CENTER);
