@@ -7,7 +7,33 @@
   <version>1.0-SNAPSHOT</version>
   <name>prac04</name>
   <url>http://maven.apache.org</url>
+
+  <developers>
+    <developer>
+      <id>dkap</id>
+      <name>Dylan Kapnias</name>
+      <email>u18108467@tuks.co.za</email>
+      <organization>Univeristy of Pretoria</organization>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <properties>
+   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+   <maven.compiler.source>18</maven.compiler.source>
+   <maven.compiler.target>18</maven.compiler.target>
+   <upNumber>u18108467</upNumber>
+  </properties>
+
   <dependencies>
+    <dependency>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
+      <version>3.0.4</version>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
