@@ -248,8 +248,27 @@ public class App
                 addButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        StringBuilder qB = new StringBuilder(
+                                "INSERT INTO film (title, description, release_year, language_id, " +
+                                "original_language_id, rental_duration, rental_rate, length, replacement_cost," +
+                                " rating, special_features) VALUES (");
+
+                        for (int i = 0; i < 11; i++) {
+                            if (texts[i].getText() != "") {
+                                if ((i == 0 | i == 1 | i == 9 | i == 10) && texts[i].getText() != "") qB.append("\'" + texts[i].getText() + "\'");
+                                else qB.append(texts[i].getText());
+                            } else {
+                                String s = null;
+                                qB.append(s);
+                            }
+                            if (i != 10) qB.append(", ");
+                        }
+                        qB.append(");");
+
+                        queryInsert(createConnection(), qB.toString().replace(", , ", ", NULL, "));
 
                         pop.hide();
+                        // TODO: Add the refresh of the table
                     }
                 });
 
@@ -320,6 +339,15 @@ public class App
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static void queryInsert(Connection c, String q) {
+        try {
+            Statement stmt = c.createStatement();
+            stmt.executeUpdate(q);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
     public static void main( String[] args )
