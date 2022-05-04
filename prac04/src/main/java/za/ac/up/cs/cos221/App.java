@@ -519,13 +519,13 @@ public class App
                     p1.add(labels[i]);
                     p1.add(texts[i]);
                 }
-                JButton addButton = new JButton("Update");
-                p1.add(addButton);
+                JButton upButton = new JButton("Update");
+                p1.add(upButton);
 
                 Popup pop = new PopupFactory().getPopup(control, p1, 100, 100);
                 pop.show();
 
-                addButton.addActionListener(new ActionListener() {
+                upButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         StringBuilder qB = new StringBuilder(
@@ -566,6 +566,39 @@ public class App
 
         JButton dB = new JButton("Delete");
         control.add(dB);
+        dB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JPanel p1 = new JPanel();
+                p1.setLayout(new GridLayout(2, 2));
+
+                JLabel jL = new JLabel("Customer ID to Delete");
+                jL.setBounds(10, 10, 35, 25);
+                JTextField jT = new JTextField(20);
+                jT.setBounds(50, 10, 20, 25);
+                p1.add(jL);
+                p1.add(jT);
+
+                JButton delButton = new JButton("Delete");
+                p1.add(delButton);
+
+                Popup pop = new PopupFactory().getPopup(control, p1, 100, 100);
+                pop.show();
+
+                delButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        StringBuilder qB = new StringBuilder(
+                                "DELETE FROM customer WHERE customer_id = ");
+                        qB.append(jT.getText() + ";");
+
+                        queryInsert(createConnection(), qB.toString());
+
+                        pop.hide();
+                    }
+                });
+            }
+        });
 
         return control;
     }
