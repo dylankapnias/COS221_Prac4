@@ -225,7 +225,6 @@ public class App
             public void actionPerformed(ActionEvent e) {
                 JPanel p = new JPanel();
                 p.setLayout(new GridLayout(12, 2));
-                //p.setLayout(null);
 
                 JLabel labels[] = new JLabel[11];
                 JTextField texts[] = new JTextField[11];
@@ -284,9 +283,283 @@ public class App
         return control;
     }
 
-    public static JPanel createInventoryTab() { return null; }
+    public static JPanel createInventoryTab() {
+        JPanel control = new JPanel();
+        control.setLayout(new BorderLayout());
 
-    public static JPanel createClientsTab() { return null; }
+        Vector<String> c = new Vector<>();
+        Vector<Vector<String>> d = new Vector<>();
+        Vector<String> data = new Vector<>();
+
+        c.add("Store Name");
+        c.add("Genre");
+        c.add("Number of Movies");
+
+        Connection conn = createConnection();
+        if (conn == null) {
+            System.out.println("Failed to connect to database!");
+            System.exit(1);
+        }
+
+        String q = "SELECT v.store, e.Genre, e.Stock FROM (" +
+                        "SELECT * FROM staff JOIN (" +
+                            "SELECT i.store_id as sID, COUNT(i.inventory_id) AS Stock, v.category AS Genre FROM " +
+                            "inventory AS i JOIN film_list as v ON i.film_id = v.FID GROUP BY v.category ORDER BY " +
+                            "i.store_id) " +
+                        "AS s ON staff.store_id = s.sID) " +
+                    "AS e JOIN sales_by_store AS v ON v.manager LIKE CONCAT(e.first_name, ' ', e.last_name);";
+
+        ResultSet res = queryResults(conn, q);
+        try {
+            while (res.next()) {
+                data.add(res.getString("store"));
+                data.add(res.getString("Genre"));
+                data.add(res.getString("Stock"));
+
+                d.add(new Vector<String>(data));
+                data.clear();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        DefaultTableModel m = new DefaultTableModel(d, c);
+
+        JTable t = new JTable(m);
+        t.setShowGrid(true);
+        t.setShowVerticalLines(true);
+
+        JScrollPane s = new JScrollPane(t);
+        s.setBounds(10, 30, 40, 40);
+
+        control.add(s);
+
+        return control;
+    }
+
+    public static JScrollPane createClientTable() {
+        Vector<String> c = new Vector<>();
+        Vector<Vector<String>> d = new Vector<>();
+        Vector<String> data = new Vector<>();
+
+        c.add("Client ID");
+        c.add("Store ID");
+        c.add("First Name");
+        c.add("Last Name");
+        c.add("Email");
+        c.add("Address ID");
+        c.add("Active");
+        c.add("Date of Creation");
+        c.add("Date of Update");
+
+        Connection conn = createConnection();
+        if (conn == null) {
+            System.out.println("Failed to connect to database!");
+            System.exit(1);
+        }
+
+        String q = "SELECT * " +
+                "FROM customer ";
+
+        ResultSet res = queryResults(conn, q);
+        try {
+            while (res.next()) {
+                data.add(res.getString("customer_id"));
+                data.add(res.getString("store_id"));
+                data.add(res.getString("first_name"));
+                data.add(res.getString("last_name"));
+                data.add(res.getString("email"));
+                data.add(res.getString("address_id"));
+                data.add(res.getString("active"));
+                data.add(res.getString("create_date"));
+                data.add(res.getString("last_update"));
+
+                d.add(new Vector<String>(data));
+                data.clear();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        DefaultTableModel m = new DefaultTableModel(d, c);
+
+        JTable t = new JTable(m);
+        t.setShowGrid(true);
+        t.setShowVerticalLines(true);
+
+        JScrollPane s = new JScrollPane(t);
+        s.setBounds(10, 30, 400, 400);
+
+        return s;
+    }
+
+    public static JPanel createClientsTab() {
+        Vector<String> c = new Vector<>();
+        c.add("Insert Store ID");
+        c.add("Insert Client First Name");
+        c.add("Insert Client Last Name");
+        c.add("Insert Client Email");
+        c.add("Insert Client Address ID");
+        c.add("Insert Client Active Setting");
+
+        JPanel control = new JPanel();
+        control.setLayout(new GridLayout(1, 4));
+
+        JButton lB = new JButton("List");
+        control.add(lB);
+        lB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JPanel p = new JPanel();
+                //p.setLayout(new BorderLayout());
+                p.setBounds(100, 100, 500, 500);
+
+                p.add(createClientTable(), BorderLayout.CENTER);
+
+                JButton cButton = new JButton("Close");
+                p.add(cButton, BorderLayout.SOUTH);
+
+                Popup pop = new PopupFactory().getPopup(control, p, 100, 100);
+
+                cButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        pop.hide();
+                    }
+                });
+
+                pop.show();
+            }
+        });
+
+        JButton aB = new JButton("Add");
+        control.add(aB);
+        aB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JPanel p1 = new JPanel();
+                p1.setLayout(new GridLayout(7, 2));
+
+                JLabel labels[] = new JLabel[6];
+                JTextField texts[] = new JTextField[6];
+
+                for (int i = 0; i < 6; i++) {
+                    labels[i] = new JLabel(c.get(i));
+                    labels[i].setBounds(10, 10 * i, 35, 25);
+
+                    texts[i] = new JTextField(20);
+                    texts[i].setBounds(50, 10 * i, 20, 25);
+
+                    p1.add(labels[i]);
+                    p1.add(texts[i]);
+                }
+                JButton addButton = new JButton("Add");
+                p1.add(addButton);
+
+                Popup pop = new PopupFactory().getPopup(control, p1, 100, 100);
+                pop.show();
+
+                addButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        StringBuilder qB = new StringBuilder(
+                                "INSERT INTO customer (store_id, first_name, last_name, email, " +
+                                        "address_id, active, create_date) VALUES (");
+
+                        for (int i = 0; i < 6; i++) {
+                            if (texts[i].getText() != "") {
+                                if ((i ==  1 | i == 2 | i == 3 | i == 4) && texts[i].getText() != "")
+                                    qB.append("\'" + texts[i].getText() + "\'");
+                                else qB.append(texts[i].getText());
+                            } else {
+                                String s = null;
+                                qB.append(s);
+                            }
+                            qB.append(", ");
+                        }
+                        qB.append("SYSDATE()");
+                        qB.append(");");
+
+                        queryInsert(createConnection(), qB.toString().replace(", , ", ", NULL, "));
+
+                        pop.hide();
+                        // TODO: Add the refresh of the table
+                    }
+                });
+            }
+        });
+
+        JButton uB = new JButton("Update");
+        control.add(uB);
+        uB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JPanel p1 = new JPanel();
+                p1.setLayout(new GridLayout(8, 2));
+
+                JLabel jL = new JLabel("Customer ID to Update");
+                jL.setBounds(10, 10, 35, 25);
+                JTextField jT = new JTextField(20);
+                jT.setBounds(50, 10, 20, 25);
+                p1.add(jL);
+                p1.add(jT);
+
+                JLabel labels[] = new JLabel[6];
+                JTextField texts[] = new JTextField[6];
+
+                for (int i = 0; i < 6; i++) {
+                    labels[i] = new JLabel(c.get(i));
+                    labels[i].setBounds(10, 10 * i + 1, 35, 25);
+
+                    texts[i] = new JTextField(20);
+                    texts[i].setBounds(50, 10 * i + 1, 20, 25);
+
+                    p1.add(labels[i]);
+                    p1.add(texts[i]);
+                }
+                JButton addButton = new JButton("Add");
+                p1.add(addButton);
+
+                Popup pop = new PopupFactory().getPopup(control, p1, 100, 100);
+                pop.show();
+
+                addButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        StringBuilder qB = new StringBuilder(
+                                "INSERT INTO customer (store_id, first_name, last_name, email, " +
+                                        "address_id, active, create_date) VALUES (");
+
+                        for (int i = 0; i < 6; i++) {
+                            if (texts[i].getText() != "") {
+                                if ((i ==  1 | i == 2 | i == 3 | i == 4) && texts[i].getText() != "")
+                                    qB.append("\'" + texts[i].getText() + "\'");
+                                else qB.append(texts[i].getText());
+                            } else {
+                                String s = null;
+                                qB.append(s);
+                            }
+                            qB.append(", ");
+                        }
+                        qB.append("SYSDATE()");
+                        qB.append(");");
+
+                        queryInsert(createConnection(), qB.toString().replace(", , ", ", NULL, "));
+
+                        pop.hide();
+                        // TODO: Add the refresh of the table
+                    }
+                });
+            }
+        });
+
+        JButton dB = new JButton("Delete");
+        control.add(dB);
+
+        return control;
+    }
     public static JFrame createGUI() {
         JFrame mainFrame = new JFrame();
 
@@ -298,8 +571,8 @@ public class App
 
         tabs.addTab("Staff", createStaffTab());
         tabs.addTab("Films", createFilmsTab());
-        tabs.addTab("Inventory", new JLabel("Inventory"));
-        tabs.addTab("Clients", new JLabel("Clients"));
+        tabs.addTab("Inventory", createInventoryTab());
+        tabs.addTab("Clients", createClientsTab());
 
         mainPanel.add(tabs);
 
