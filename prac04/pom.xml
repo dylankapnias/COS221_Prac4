@@ -22,8 +22,8 @@
 
   <properties>
    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-   <maven.compiler.source>18</maven.compiler.source>
-   <maven.compiler.target>18</maven.compiler.target>
+   <maven.compiler.source>11</maven.compiler.source>
+   <maven.compiler.target>11</maven.compiler.target>
    <upNumber>u18108467</upNumber>
   </properties>
 
@@ -41,4 +41,28 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>za.ac.up.cs.cos221.App</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
