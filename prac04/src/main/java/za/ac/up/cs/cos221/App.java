@@ -510,7 +510,7 @@ public class App
                 JTextField texts[] = new JTextField[6];
 
                 for (int i = 0; i < 6; i++) {
-                    labels[i] = new JLabel(c.get(i));
+                    labels[i] = new JLabel(c.get(i).replace("Insert", "Update"));
                     labels[i].setBounds(10, 10 * i + 1, 35, 25);
 
                     texts[i] = new JTextField(20);
@@ -519,7 +519,7 @@ public class App
                     p1.add(labels[i]);
                     p1.add(texts[i]);
                 }
-                JButton addButton = new JButton("Add");
+                JButton addButton = new JButton("Update");
                 p1.add(addButton);
 
                 Popup pop = new PopupFactory().getPopup(control, p1, 100, 100);
@@ -529,24 +529,33 @@ public class App
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         StringBuilder qB = new StringBuilder(
-                                "INSERT INTO customer (store_id, first_name, last_name, email, " +
-                                        "address_id, active, create_date) VALUES (");
+                                "UPDATE customer SET ");
 
                         for (int i = 0; i < 6; i++) {
-                            if (texts[i].getText() != "") {
-                                if ((i ==  1 | i == 2 | i == 3 | i == 4) && texts[i].getText() != "")
-                                    qB.append("\'" + texts[i].getText() + "\'");
-                                else qB.append(texts[i].getText());
-                            } else {
-                                String s = null;
-                                qB.append(s);
+                            switch (i) {
+                                case 0:
+                                    if (!texts[i].getText().equals("")) qB.append("store_id = " + texts[i].getText() + ", ");
+                                    break;
+                                case 1:
+                                    if (!texts[i].getText().equals("")) qB.append("first_name = \'" + texts[i].getText() + "\', ");
+                                    break;
+                                case 2:
+                                    if (!texts[i].getText().equals("")) qB.append("last_name = \'" + texts[i].getText() + "\', ");
+                                    break;
+                                case 3:
+                                    if (!texts[i].getText().equals("")) qB.append("email = \'" + texts[i].getText() + "\', ");
+                                    break;
+                                case 4:
+                                    if (!texts[i].getText().equals("")) qB.append("address_id = " + texts[i].getText() + ", ");
+                                    break;
+                                case 5:
+                                    if (!texts[i].getText().equals("")) qB.append("active = " + texts[i].getText() + ", ");
+                                    break;
                             }
-                            qB.append(", ");
                         }
-                        qB.append("SYSDATE()");
-                        qB.append(");");
+                        qB.append("WHERE customer_id = " + jT.getText() + ";");
 
-                        queryInsert(createConnection(), qB.toString().replace(", , ", ", NULL, "));
+                        queryInsert(createConnection(), qB.toString().replace(", WHERE", " WHERE"));
 
                         pop.hide();
                         // TODO: Add the refresh of the table
@@ -623,6 +632,7 @@ public class App
             e.printStackTrace();
         }
     }
+
     public static void main( String[] args )
     {
         JFrame gui = createGUI();
